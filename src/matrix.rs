@@ -10,7 +10,8 @@ pub struct Matrix<const C: usize, const R: usize> {
     player_flag: bool,
     win_game: bool,
     player_position: (usize,usize),
-    data: [[DrawType; R]; C]
+    data: [[DrawType; R]; C],
+    goal_position: (usize, usize)
 }
 impl<const C: usize, const R: usize> Default for Matrix<C, R> {
     fn default() -> Self{
@@ -18,6 +19,7 @@ impl<const C: usize, const R: usize> Default for Matrix<C, R> {
             player_flag: false,
             win_game :false,
             player_position: (0,0),
+            goal_position: (0,0),
             data: [[DrawType::Empty; R]; C]
         }
     }
@@ -76,6 +78,7 @@ impl<const COLS: usize, const ROWS: usize> LevelMatrixTrait for Matrix<COLS, ROW
             Err("Invald GOAL Poition: object already there")
         }else{
             self.data[x][y] = DrawType::Goal;
+            self.goal_position = (x,y);
             Ok(())
         }
     }
@@ -87,7 +90,6 @@ impl<const COLS: usize, const ROWS: usize> LevelMatrixTrait for Matrix<COLS, ROW
             Direction::Left => (posx, sat_sub(posy, 1, 0)),
             Direction::Down => (sat_add(posx, 1, COLS-1), posy),
             Direction::Up => (sat_sub(posx, 1, 0), posy),
-            _ => (posx, posy)
         };
         if self.data[new_posx][new_posy]==DrawType::Obstacle {
            return; 
@@ -106,9 +108,17 @@ impl<const COLS: usize, const ROWS: usize> LevelMatrixTrait for Matrix<COLS, ROW
     fn lose_game(&mut self){
         self.win_game=false;
     }
+    fn player_position(&self) -> (usize,usize){
+        self.player_position
+    }
+    fn goal_position(&self) -> (usize,usize){
+        self.goal_position
+    }
 }
 
 pub trait LevelMatrixTrait {
+    fn goal_position(&self) -> (usize,usize);
+    fn player_position(&self) -> (usize,usize);
     fn lose_game(&mut self);
     fn print_matrix(&self);
     fn set_player_start(&mut self, x:usize, y:usize)->Result<(),&str>;

@@ -3,7 +3,7 @@ use crossterm::{
     event::{self, Event, KeyCode, KeyEvent},
     terminal::{enable_raw_mode, disable_raw_mode},
 };
-use std::time::{self, Instant};
+use std::time::Instant;
 
 pub struct Game{
     pub level_map: Box<dyn LevelMatrixTrait>,
