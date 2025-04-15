@@ -1,5 +1,4 @@
 use crate::*;
-//p
 
 pub fn radom_gen_lvl()->Matrix<COL,ROW>{
     loop{
