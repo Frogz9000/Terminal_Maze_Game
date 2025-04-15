@@ -1,5 +1,10 @@
 use crate::*;
 
+const AVATAR: char =  '😎';
+const OBSTACLE: char = '🌵';
+const GOAL: char = '🏆';
+const EMPTY: char = '🟫';
+
 #[derive(Clone)]
 pub struct Matrix<const C: usize, const R: usize> {
     player_flag: bool,
@@ -113,3 +118,21 @@ pub trait LevelMatrixTrait {
     fn win_game(&self)->bool;
 
 }
+
+fn sat_add(num1:usize, num2:usize, limit:usize) -> usize{
+    let mut res = num1+num2;
+    if res>limit{
+        res = limit;
+    }
+    res
+}
+
+
+fn sat_sub(num1:usize, num2:usize, limit:usize)-> usize{
+let mut res = num1.saturating_sub(num2);
+if res<limit{
+    res = limit;
+}
+res
+}
+
