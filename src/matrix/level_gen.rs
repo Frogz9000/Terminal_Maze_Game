@@ -42,7 +42,7 @@ fn random_size(c: usize, r: usize)->(usize,usize){
 fn valid_path(matrix: &Matrix<COL, ROW>)->Result<(),&'static str>{
     if let Some(_) = astar(
         &matrix.player_position,
-        |coordinate| neighbors_and_heuristics_of_neighbors_of_coordinaqte(*coordinate, matrix),
+        |coordinate| neighbors_and_heuristics_of_neighbors_of_coordinate(*coordinate, matrix),
         |coordinate| distance(*coordinate, matrix),
         |coordinate| coordinate.0 == matrix.goal_position.0 && coordinate.1 == matrix.goal_position.1
     ) {
