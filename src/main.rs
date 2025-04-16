@@ -1,27 +1,12 @@
 mod matrix;
 mod game;
-mod level_gen;
+pub mod direction;
+
 use std::usize;
 use std::io::{self,Write};
 use game::*;
 use matrix::*;
 use level_gen::*;
-
-#[derive(Copy,Clone,PartialEq,Default)]
-enum DrawType{
-    #[default]
-    Empty,
-    Obstacle,
-    Player,
-    Goal
-}
-#[derive(PartialEq)]
-enum Direction{
-    Up,
-    Down,
-    Left,
-    Right
-}
 
 const COL:usize = 10;
 const ROW:usize = 20;

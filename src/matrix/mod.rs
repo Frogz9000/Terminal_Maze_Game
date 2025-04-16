@@ -1,9 +1,9 @@
-use crate::*;
+pub mod level;
+pub mod level_gen;
 
-const AVATAR: char =  '😎';
-const OBSTACLE: char = '🌵';
-const GOAL: char = '🏆';
-const EMPTY: char = '🟫';
+use std::fmt::Display;
+use level::LevelMatrixTrait;
+use crate::{direction::Direction, *};
 
 #[derive(Clone)]
 pub struct Matrix<const C: usize, const R: usize> {
@@ -24,23 +24,22 @@ impl<const C: usize, const R: usize> Default for Matrix<C, R> {
         }
     }
 }
-impl<const COLS: usize, const ROWS: usize> LevelMatrixTrait for Matrix<COLS, ROWS> {
-
-    fn print_matrix(&self) {
+impl<const COLS: usize, const ROWS: usize> Display for Matrix<COLS, ROWS> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        // write!(f, "({}, {})", self.x, self.y)
         for col in &self.data {
             for cell in col.iter() {
-                let emoji: char = match cell {
-                    DrawType::Obstacle => OBSTACLE,
-                    DrawType::Player => AVATAR,
-                    DrawType::Goal => GOAL,
-                    DrawType::Empty => EMPTY
-                };
-                print!("{} ", emoji);
+                write!(f, "{} ", cell.to_char())?;
             }
-            println!();
-            print!("\r");
+            writeln!(f, "")?;
+            write!(f, "\r")?;
         }
+        Ok(())
     }
+}
+
+
+impl<const COLS: usize, const ROWS: usize> LevelMatrixTrait for Matrix<COLS, ROWS> {
     fn set_player_start(&mut self, x:usize, y:usize)->Result<(),&str>{
         //since player is size 1x1 the x and y are it's true position
         if COLS-1<y || ROWS-1<x {
@@ -114,20 +113,44 @@ impl<const COLS: usize, const ROWS: usize> LevelMatrixTrait for Matrix<COLS, ROW
     fn goal_position(&self) -> (usize,usize){
         self.goal_position
     }
+    
+    fn get_tile(&self, coordinate: (usize, usize)) -> Option<DrawType> {
+        let (x, y) = coordinate;
+
+        if 0 <= x && x < COL && 0 <= y && y < ROW {
+            Some(self.data[x][y])
+        } else {
+            None
+        }
+    }
 }
 
-pub trait LevelMatrixTrait {
-    fn goal_position(&self) -> (usize,usize);
-    fn player_position(&self) -> (usize,usize);
-    fn lose_game(&mut self);
-    fn print_matrix(&self);
-    fn set_player_start(&mut self, x:usize, y:usize)->Result<(),&str>;
-    fn set_obstacle(&mut self, x:usize, y:usize, l: usize, w:usize)->Result<(),&str>;
-    fn set_goal(&mut self, x:usize, y:usize)->Result<(),&str>;
-    fn update_player_position(&mut self, dir : Direction);
-    fn win_game(&self)->bool;
+impl Matrix<COL, ROW> {
+    fn get_neightbors_with_no_checks(&self, coordinate: (usize, usize)) -> impl IntoIterator<Item=(usize, usize)> {
+        let mut out = Vec::new();
 
+        let (x, y) = coordinate;
+
+        if x > 0 {
+            out.push((x - 1, y))
+        }
+
+        if x < COL - 1 {
+            out.push((x + 1, y));
+        }
+
+        if y > 0 {
+            out.push((x, y - 1))
+        }
+
+        if y < ROW - 1 {
+            out.push((x, y + 1))
+        }
+
+        return out;
+    }
 }
+
 
 fn sat_add(num1:usize, num2:usize, limit:usize) -> usize{
     let mut res = num1+num2;
@@ -139,10 +162,28 @@ fn sat_add(num1:usize, num2:usize, limit:usize) -> usize{
 
 
 fn sat_sub(num1:usize, num2:usize, limit:usize)-> usize{
-let mut res = num1.saturating_sub(num2);
-if res<limit{
-    res = limit;
-}
-res
+    let mut res = num1.saturating_sub(num2);
+    if res<limit{
+        res = limit;
+    }
+    res
 }
 
+#[derive(Copy,Clone,PartialEq,Default)]
+pub enum DrawType{
+    #[default]
+    Empty,
+    Obstacle,
+    Player,
+    Goal
+}
+impl DrawType{
+    fn to_char(&self)->char{
+        match self {
+            DrawType::Player => '😎',
+            DrawType::Obstacle => '🌵',
+            DrawType::Goal => '🏆',
+            DrawType::Empty => '🟫',
+        }
+    }
+}
