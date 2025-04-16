@@ -17,11 +17,11 @@ pub fn radom_gen_lvl()->Matrix<COL,ROW>{
 fn setup_level()->Option<Matrix<COL,ROW>>{
 
     let mut lvl: Matrix<COL,ROW> = Matrix::default();
-    let num_obstacles = rand::random_range(1..(ROW*COL/4));
+    let num_obstacles = rand::random_range((ROW*COL)/4..ROW*COL);
     for _ in 0..num_obstacles{
         let (c, r) = random_position(COL, ROW);
-        let (len, wid) = random_size(4,8);
-        let Ok(()) = lvl.set_obstacle(r, c, len, wid) else { return None};
+        //let (len, wid) = random_size(COL,ROW);
+        let Ok(()) = lvl.set_obstacle(r, c, 1, 1) else { return None};
     }
     let (c, r) = random_position(COL, ROW);
     let Ok(()) = lvl.set_goal(c, r) else { return None};
@@ -35,9 +35,9 @@ fn random_position(c: usize, r: usize)->(usize,usize){
     (rand::random_range(0..c-1),rand::random_range(0..r-1))
 }
 
-fn random_size(c: usize, r: usize)->(usize,usize){
-    (rand::random_range(1..c),rand::random_range(1..r))
-}
+//fn random_size(c: usize, r: usize)->(usize,usize){
+//    (rand::random_range(1..c),rand::random_range(1..r))
+//}
 
 fn valid_path(matrix: &Matrix<COL, ROW>)->Result<(),&'static str>{
     if let Some(_) = astar(
