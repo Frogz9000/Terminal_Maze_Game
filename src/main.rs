@@ -1,8 +1,8 @@
 mod matrix;
 mod game;
 pub mod direction;
+mod taylors_version;
 
-use std::usize;
 use std::io::{self,Write};
 use game::*;
 use matrix::*;
@@ -10,7 +10,14 @@ use level_gen::*;
 
 const COL:usize = 10;
 const ROW:usize = 20;
+
+const TAYLORS_VERSION: bool = true;
+
 fn main() {
+    if TAYLORS_VERSION {
+        taylors_version::main();
+        return;
+    }
 
     let mut current_game = Game{level_map:  Box::new(radom_gen_lvl()),score: 0.0,level_number:1};
     current_game.game_loop();
